@@ -1,12 +1,18 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+require 'yaml'
+
+options = YAML.load_file('options.yaml')
+
 Vagrant.configure("2") do |config|
 
 #shared settings
   config.vm.box = "bento/debian-9"
 
   config.vm.synced_folder "./config", "/tmp/config"
+
+  
 
 # Single Machine
 # Primary build
@@ -20,14 +26,18 @@ Vagrant.configure("2") do |config|
     # Customize the amount of memory on the VM:
       vb.memory = "4096"
       vb.customize ["modifyvm", :id, "--vram", "16"]
-      samuraiwtf.vm.provision :shell, path: "install/vbox_provisioning.sh"
-      samuraiwtf.vm.provision :shell, inline: "shutdown -r +1"
+      # samuraiwtf.vm.provision :shell, path: "install/vbox_provisioning.sh"
+      # samuraiwtf.vm.provision :shell, inline: "shutdown -r +1"
     end
 
-    samuraiwtf.vm.provision :shell, path: "install/shared_before.sh"
-    samuraiwtf.vm.provision :shell, path: "install/userenv_bootstrap.sh"
-    samuraiwtf.vm.provision :shell, path: "install/target_bootstrap.sh"
-    samuraiwtf.vm.provision :shell, path: "install/local_targets.sh"
+    # samuraiwtf.vm.provision :shell, path: "install/shared_before.sh"
+    # samuraiwtf.vm.provision :shell, path: "install/userenv_bootstrap.sh"
+    # samuraiwtf.vm.provision :shell, path: "install/target_bootstrap.sh"
+    # samuraiwtf.vm.provision :shell, path: "install/local_targets.sh"
+    options = YAML.load_file('options.yaml')
+    
+
+    options["targets"].each { |target_name| samuraiwtf.vm.provision :shell, path: "target_install/#{target_name}.sh"}
 
   end
 
